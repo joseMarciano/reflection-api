@@ -14,15 +14,16 @@ public class Alurator {
     public Object executa(String url) {
         Request request = new Request(url);
         String controllerName = request.getControllerName();
+        String methodName = request.getMethodName();
 
-        Object controleInstance = Reflection.Builder
+        Object returnMethod = Reflection.Builder
                 .create()
                 .refleteClass(this.basePackage + controllerName)
-                .getDefaultConstructor()
+                .createInstance()
+                .getMethod(methodName)
                 .invoke();
 
-
-        System.out.println(controleInstance);
-        return null;
+        System.out.println(returnMethod);
+        return returnMethod;
     }
 }

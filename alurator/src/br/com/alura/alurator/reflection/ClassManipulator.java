@@ -18,4 +18,9 @@ public class ClassManipulator {
             throw new RuntimeException(e);
         }
     }
+
+    public ObjectManipulator createInstance() {
+        Object instance = getDefaultConstructor().invoke();
+        return new ObjectManipulator(instance);
+    }
 }
