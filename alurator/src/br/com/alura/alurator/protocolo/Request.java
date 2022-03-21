@@ -1,20 +1,34 @@
 package br.com.alura.alurator.protocolo;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Request {
-	private String controllerName;
-	private String methodName;
+    private String controllerName;
+    private String methodName;
+    private Map<String, Object> queryParams;
 
-	public Request(String url) {
-		String[] urlParts = url.replaceFirst("/", "").split("/");
-		this.controllerName = Character.toUpperCase(urlParts[0].charAt(0))  + urlParts[0].substring(1)  + "Controller";
-		this.methodName = urlParts[1];
-	}
+    public Request(String url) {
+        String[] urlParts = url.replaceFirst("/", "").split("[?]");
+        String[] controleAndMethod = urlParts[0].split("/");
 
-	public String getControllerName() {
-		return controllerName;
-	}
 
-	public String getMethodName() {
-		return this.methodName;
+        this.controllerName = Character.toUpperCase(controleAndMethod[0].charAt(0)) + controleAndMethod[0].substring(1) + "Controller";
+        this.methodName = controleAndMethod[1];
+        this.queryParams = urlParts[1].length() > 1
+                ? new QueryParamsBuilder().withParams(urlParts[1]).build()
+                : new HashMap<>();
+    }
+
+    public String getControllerName() {
+        return controllerName;
+    }
+
+    public String getMethodName() {
+        return this.methodName;
+    }
+
+	public Map<String, Object> getQueryParams() {
+		return queryParams;
 	}
 }
