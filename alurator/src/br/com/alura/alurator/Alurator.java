@@ -1,5 +1,6 @@
 package br.com.alura.alurator;
 
+import br.com.alura.alurator.conversor.XMLConversor;
 import br.com.alura.alurator.protocolo.Request;
 import br.com.alura.alurator.reflection.Reflection;
 
@@ -26,7 +27,7 @@ public class Alurator {
                 .getMethod(methodName, queryParams)
                 .invoke();
 
-        System.out.println(returnMethod);
+        returnMethod = new XMLConversor().converte(returnMethod);
         return returnMethod;
     }
 }

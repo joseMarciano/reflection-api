@@ -15,7 +15,7 @@ public class Request {
 
         this.controllerName = Character.toUpperCase(controleAndMethod[0].charAt(0)) + controleAndMethod[0].substring(1) + "Controller";
         this.methodName = controleAndMethod[1];
-        this.queryParams = urlParts[1].length() > 1
+        this.queryParams = urlParts.length > 1
                 ? new QueryParamsBuilder().withParams(urlParts[1]).build()
                 : new HashMap<>();
     }
