@@ -1,45 +1,47 @@
 package br.com.alura.alurator.conversor;
 
+import br.com.alura.alurator.conversor.anotacao.NameTagXML;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 
 import static java.lang.String.format;
 
 public class XMLConversor {
+
+    private StringBuilder xmlBuilder;
+
+    public XMLConversor() {
+        this.xmlBuilder = new StringBuilder();
+    }
+
     public String converte(Object object) {
         try {
             Class<?> aClass = object.getClass();
-            StringBuilder xmlBuilder = new StringBuilder();
 
             if (object instanceof Collection) {
                 Collection<?> collection = (Collection<?>) object;
 
-                xmlBuilder.append("<lista>");
+                appendNameXML(collection.getClass(), false);
 
                 for (Object o : collection) {
                     String xml = converte(o);
-                    xmlBuilder.append(xml);
+                    this.xmlBuilder.append(xml);
                 }
 
-                xmlBuilder.append("</lista>");
+                appendNameXML(collection.getClass(), true);
 
             } else {
-                String className = aClass.getSimpleName().toLowerCase();
 
-                xmlBuilder.append(format("<%s>", className));
-
+                appendNameXML(aClass, false);
                 for (Field atribute : aClass.getDeclaredFields()) {
                     atribute.setAccessible(true);
-
-                    String atributeName = atribute.getName();
                     Object valueAtribute = atribute.get(object);
-
-                    xmlBuilder.append(format("<%s>", atributeName));
+                    appendNameXML(atribute, false);
                     xmlBuilder.append(valueAtribute);
-                    xmlBuilder.append(format("</%s>", atributeName));
+                    appendNameXML(atribute, true);
                 }
-
-                xmlBuilder.append(format("</%s>", className));
+                appendNameXML(aClass, true);
             }
 
             return xmlBuilder.toString();
@@ -48,6 +50,65 @@ public class XMLConversor {
             throw new RuntimeException("Error on generate XML");
         }
 
+    }
+
+
+    public void appendNameXML(Object object, boolean isEnd) {
+
+        if (object instanceof Class) {
+            Class<?> aClass = (Class<?>) object;
+            appendClassTypeXml(aClass, isEnd);
+            return;
+        }
+
+        if (object instanceof Field) {
+            Field field = (Field) object;
+            appendFieldTypeXml(field, isEnd);
+            return;
+        }
+
+        throw new RuntimeException("Error on parse to XML");
+
+
+    }
+
+    private void appendFieldTypeXml(Field field, boolean isEnd) {
+        boolean annotationPresent = field.isAnnotationPresent(NameTagXML.class);
+        if (annotationPresent) {
+            NameTagXML annotation = field.getAnnotation(NameTagXML.class);
+            if (isEnd) {
+                xmlBuilder.append(format("</%s>", annotation.value()));
+                return;
+            }
+            xmlBuilder.append(format("<%s>", annotation.value()));
+
+        } else {
+            if (isEnd) {
+                xmlBuilder.append(format("</%s>", field.getName().toLowerCase()));
+                return;
+            }
+            xmlBuilder.append(format("<%s>", field.getName().toLowerCase()));
+        }
+
+    }
+
+    private void appendClassTypeXml(Class<?> aClass, boolean isEnd) {
+        boolean annotationPresent = aClass.isAnnotationPresent(NameTagXML.class);
+        if (annotationPresent) {
+            NameTagXML annotation = aClass.getAnnotation(NameTagXML.class);
+            if (isEnd) {
+                xmlBuilder.append(format("</%s>", annotation.value()));
+                return;
+            }
+            xmlBuilder.append(format("<%s>", annotation.value()));
+
+        } else {
+            if (isEnd) {
+                xmlBuilder.append(format("</%s>", aClass.getSimpleName().toLowerCase()));
+                return;
+            }
+            xmlBuilder.append(format("<%s>", aClass.getSimpleName().toLowerCase()));
+        }
     }
 
 }

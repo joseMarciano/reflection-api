@@ -1,9 +1,20 @@
 package br.com.alura.estoque.modelo;
 
+import br.com.alura.alurator.conversor.anotacao.NameTagXML;
+
+@NameTagXML("product")
 public class Produto {
+
+//	@NameTagXML("name")
 	private String nome;
+
+	@NameTagXML("value")
 	private double valor;
+
+	@NameTagXML("brand")
 	private String marca;
+
+
 	public Produto(String nome, double valor, String marca) {
 		this.nome = nome;
 		this.valor = valor;
